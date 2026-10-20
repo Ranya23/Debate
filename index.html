@@ -1,0 +1,191 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d1b2a"><link rel="manifest" href="manifest.json"><link rel="icon" href="icon.svg">
+<title>Verdict</title>
+<style>
+:root{--ink:#0d1b2a;--paper:#f3f5f8;--A:#1f5eff;--B:#e8590c;--win:#12a679;--mut:#5b6b7e;--line:#dde3ea}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Tahoma,"Noto Sans Arabic",Roboto,sans-serif;background:var(--paper);color:var(--ink);padding-bottom:env(safe-area-inset-bottom)}
+header{background:var(--ink);color:#fff;padding:calc(18px + env(safe-area-inset-top)) 20px 54px}
+.brand{display:flex;align-items:center;gap:12px;max-width:720px;margin:auto}.brand>div{flex:1}
+.brand b{font-size:26px;letter-spacing:-.5px;font-weight:800}.brand small{display:block;opacity:.6;font-size:13px;margin-top:-4px}
+#lg{background:#ffffff1f;color:#fff;width:auto}
+main{max-width:720px;margin:-34px auto 48px;padding:0 14px}main.wide{max-width:1000px}
+.card{background:#fff;border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 1px 2px #0d1b2a14,0 10px 30px -12px #0d1b2a40}
+h2{font-size:20px;letter-spacing:-.3px;margin:0 0 4px;font-weight:800}
+p{margin:4px 0 14px;color:var(--mut)}
+input,textarea,button{font:inherit;color:inherit}
+input[type=text],input[type=password],input[type=number],textarea{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:#fff;margin-bottom:10px}
+textarea{min-height:96px;resize:vertical}
+input:focus,textarea:focus,button:focus-visible{outline:3px solid #1f5eff55;border-color:var(--A)}
+.btn{border:0;border-radius:12px;padding:13px 18px;font-weight:700;background:var(--ink);color:#fff;cursor:pointer;width:100%;transition:transform .1s}
+.btn:active{transform:scale(.98)}.btn.A{background:var(--A)}.btn.B{background:var(--B)}.btn.o{background:#e8edf3;color:var(--ink)}
+.btn.s{width:auto;padding:9px 14px;font-size:14px}.btn[disabled]{opacity:.5}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{flex:1}
+.digits{font:800 clamp(44px,15vw,72px)/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.18em;text-align:center;padding:14px 0!important;border:2px solid var(--ink)!important;border-radius:16px!important}
+.code{font:800 46px/1 ui-monospace,Menlo,monospace;letter-spacing:.16em;text-align:center;margin:10px 0 14px;direction:ltr}
+.tag{display:inline-block;padding:3px 10px;border-radius:99px;font-size:13px;font-weight:700;background:#e8edf3;flex:0 0 auto}.tag.on{background:#d6f5ea;color:#0b6b4d}
+.team{border-inline-start:6px solid var(--A)}.team.B{border-inline-start-color:var(--B)}
+.crit{display:grid;grid-template-columns:1fr auto;gap:2px 10px;margin:14px 0}
+.crit input{grid-column:1/3;width:100%;height:34px;accent-color:var(--A)}.team.B .crit input{accent-color:var(--B)}
+.crit output{font-weight:800;font-variant-numeric:tabular-nums}
+.rk{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:14px;background:var(--paper);margin-top:8px}
+.rk.w{background:#d6f5ea;outline:2px solid var(--win)}
+.rk i{font:800 24px/1 system-ui;font-style:normal;width:30px;text-align:center}
+.rk div{flex:1}.rk small{display:block;color:var(--mut)}.rk em{font:800 24px/1 system-ui;font-style:normal;font-variant-numeric:tabular-nums}
+.opt{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;border-radius:14px;padding:18px;margin-top:10px;font:700 18px system-ui,"Noto Sans Arabic";color:#fff;text-align:start;cursor:pointer}
+.o0{background:#1f5eff}.o1{background:#e8590c}.o2{background:#0f9d6e}.o3{background:#8a3ffc}
+.opt[disabled]{cursor:default}.opt.dim{opacity:.3}.opt.win{outline:4px solid var(--ink)}.opt.sel{outline:4px solid #ffd43b}
+.opt em{font-style:normal;background:#0003;border-radius:99px;padding:2px 12px}
+.bar{flex:1;height:10px;border-radius:9px;background:#e8edf3;overflow:hidden}.bar i{display:block;height:100%;background:var(--ink);width:100%}
+.ctr{text-align:center}.ctr #q{display:grid;place-items:center;margin:16px 0}
+.ov{position:fixed;inset:0;background:#fff;z-index:9;display:grid;place-content:center;justify-items:center;text-align:center;padding:20px;cursor:pointer}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translate(-50%,40px);background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;opacity:0;transition:.25s;z-index:20;max-width:90%}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+.ok{color:var(--win);font-weight:700}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+<header><div class="brand"><svg width="38" height="38" viewBox="0 0 38 38"><circle cx="14" cy="19" r="12" fill="#1f5eff"/><circle cx="24" cy="19" r="12" fill="#e8590c" style="mix-blend-mode:screen"/></svg><div><b>Verdict</b><small id="sb"></small></div><button class="btn s" id="lg"></button></div></header>
+<main id="app"></main><div id="toast"></div>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const SB_URL='https://wmhuetfqmlpobbnsqorr.supabase.co',SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndtaHVldGZxbWxwb2JibnNxb3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxMzcxNTgsImV4cCI6MjA5OTcxMzE1OH0.f_a247jJYG2edXuAr4kNTqrbo03mbOXLEgCAmHkjgfU';
+const I={en:{sub:'Peer assessment and live quizzes',joinT:'Join',joinP:'Enter the 4-digit code on the screen.',go:'Continue',nm:'Your full name',gr:'Your group',req:'Name and group are required.',qjp:'Enter your name and group to play.',enter:'Join',which:'Which group are you in?',aud:'I’m in the audience',scoreP:'Score every criterion. You can score each group once.',sub2:'Submit score',done:'Your score is submitted. Thank you.',closedP:'Scoring is closed. Wait for your teacher to release the result.',chk:'Check again',res:'Final result',wait:'You’re in. Waiting for the teacher to start…',locked:'Answer locked in. Waiting for the others…',ok:'Correct',no:'Not this time',pts:'points',rank:'Your rank',tu:'Time’s up',fin:'Final scores',tp:'Teacher panel',pass:'Passcode',in:'Sign in',out:'Sign out',tabA:'Assessment',tabQ:'Quiz',newD:'New debate',ttl:'Title',ga:'Group A name',gb:'Group B name',mem:'Members, one name per line (optional)',rub:'Rubric: one criterion per line as name, maximum mark',mk:'Create debate and code',open:'Scoring open',cl:'Closed',qr:'Show QR',close:'Close scoring',reopen:'Reopen',rel:'Release result',hide:'Hide result',ys:'Your scores, out of',wt:'Your weight',tch:'teacher',stu:'students',save:'Save',del:'Delete',live:'Live result',votes:'votes',conf:'Delete this? It cannot be undone.',newQ:'New quiz',qf:'One question per line: question | option | option | option | option | number of the correct option',secs:'Seconds per question',mkQ:'Create quiz and code',start:'Start quiz',reveal:'Show answer',next:'Next question',last:'Finish quiz',scr:'Copy projector link',copied:'Link copied',xl:'Excel',wd:'Word',all:'Export everything',plr:'players',qn:'Question',ph_lobby:'Waiting for players',ph_q:'Question open',ph_r:'Answer shown',ph_end:'Finished',scan:'Scan the QR, then enter the code',ans:'answered',bad:'Add a title, both group names and at least one criterion.',badQ:'Add a title and at least one question with 2 to 4 options.',sent:'Score submitted',none:'Nothing to export yet.',mems:'Group members'},
+ku:{sub:'هەڵسەنگاندنی هاوڕێیان و کویزی ڕاستەوخۆ',joinT:'بەشداربوون',joinP:'کۆدی ٤ ژمارەیی سەر شاشەکە بنووسە.',go:'بەردەوامبە',nm:'ناوی سیانیت',gr:'گرووپەکەت',req:'ناو و گرووپ پێویستن.',qjp:'ناو و گرووپەکەت بنووسە بۆ بەشداریکردن.',enter:'بچۆ ژوورەوە',which:'تۆ لە کام گرووپیت؟',aud:'من بینەرم',scoreP:'هەموو پێوەرەکان نمرە بدە. بۆ هەر گرووپێک تەنها جارێک دەتوانیت نمرە بدەیت.',sub2:'ناردنی نمرە',done:'نمرەکەت نێردرا. سوپاس.',closedP:'نمرەدان داخراوە. چاوەڕێی بڵاوکردنەوەی ئەنجام بکە لەلایەن مامۆستاوە.',chk:'دووبارە بپشکنە',res:'ئەنجامی کۆتایی',wait:'چوویتە ژوورەوە. چاوەڕێی دەستپێکردنی مامۆستا بکە…',locked:'وەڵامەکەت تۆمار کرا. چاوەڕێی ئەوانی تر بکە…',ok:'ڕاستە',no:'ئەمجارە نا',pts:'پۆینت',rank:'ڕیزبەندیت',tu:'کات تەواو بوو',fin:'نمرەکانی کۆتایی',tp:'پانێڵی مامۆستا',pass:'وشەی نهێنی',in:'چوونەژوورەوە',out:'چوونەدەرەوە',tabA:'هەڵسەنگاندن',tabQ:'کویز',newD:'مناقەشەی نوێ',ttl:'ناونیشان',ga:'ناوی گرووپی A',gb:'ناوی گرووپی B',mem:'ئەندامان، هەر ناوێک لە دێڕێک (ئارەزوومەندانە)',rub:'پێوەرەکان: هەر پێوەرێک لە دێڕێک بە شێوەی ناو، زۆرترین نمرە',mk:'دروستکردنی مناقەشە و کۆد',open:'نمرەدان کراوەیە',cl:'داخراوە',qr:'پیشاندانی QR',close:'داخستنی نمرەدان',reopen:'کردنەوە',rel:'بڵاوکردنەوەی ئەنجام',hide:'شاردنەوەی ئەنجام',ys:'نمرەکانی تۆ، لە',wt:'کێشی تۆ',tch:'مامۆستا',stu:'قوتابیان',save:'پاشەکەوتکردن',del:'سڕینەوە',live:'ئەنجامی ڕاستەوخۆ',votes:'دەنگ',conf:'دڵنیایت لە سڕینەوە؟ ناگەڕێتەوە.',newQ:'کویزی نوێ',qf:'هەر پرسیارێک لە دێڕێک: پرسیار | هەڵبژاردە | هەڵبژاردە | هەڵبژاردە | هەڵبژاردە | ژمارەی هەڵبژاردەی ڕاست',secs:'چرکە بۆ هەر پرسیارێک',mkQ:'دروستکردنی کویز و کۆد',start:'دەستپێکردنی کویز',reveal:'پیشاندانی وەڵام',next:'پرسیاری دواتر',last:'تەواوکردنی کویز',scr:'کۆپیکردنی لینکی پڕۆژێکتەر',copied:'لینک کۆپی کرا',xl:'ئێکسڵ',wd:'وۆرد',all:'دابەزاندنی هەموو شتێک',plr:'یاریزان',qn:'پرسیار',ph_lobby:'چاوەڕێی یاریزانان',ph_q:'پرسیار کراوەیە',ph_r:'وەڵام پیشاندرا',ph_end:'کۆتایی هات',scan:'QR سکان بکە، پاشان کۆدەکە بنووسە',ans:'وەڵامیان داوە',bad:'ناونیشان، ناوی هەردوو گرووپ و بەلایەنی کەمەوە یەک پێوەر زیاد بکە.',badQ:'ناونیشان و بەلایەنی کەمەوە یەک پرسیار بە ٢ تا ٤ هەڵبژاردە زیاد بکە.',sent:'نمرە نێردرا',none:'هێشتا هیچ شتێک نییە بۆ دابەزاندن.',mems:'ئەندامانی گرووپ'}};
+let lang=localStorage.vd_l||'en',R=()=>{};
+const T=k=>I[lang][k]??I.en[k]??k;
+const $=s=>document.querySelector(s),app=$('#app'),E=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const applyL=()=>{document.documentElement.lang=lang=='ku'?'ckb':'en';document.documentElement.dir=lang=='ku'?'rtl':'ltr';$('#lg').textContent=lang=='ku'?'EN':'کوردی';$('#sb').textContent=T('sub')};
+$('#lg').onclick=()=>{lang=lang=='ku'?'en':'ku';localStorage.vd_l=lang;applyL();R()};
+const rpc=(fn,b)=>fetch(`${SB_URL}/rest/v1/rpc/${fn}`,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(b)}).then(async r=>{const j=await r.json().catch(()=>null);if(!r.ok)throw new Error(j&&j.message||'Connection problem. Try again.');return j});
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2800)};
+const tok=localStorage.vd_tok||(localStorage.vd_tok=crypto.randomUUID());
+const mkqr=(el,c,w)=>new QRCode(el,{text:location.origin+location.pathname+'?c='+c,width:w,height:w});
+const SH=['▲','◆','●','■'];
+const calc=d=>{const mx=d.rubric.reduce((s,r)=>s+r.max,0),w=d.w_teacher/100;
+ return['a','b'].map(k=>{const g=d[k],cr=g.sums.map(v=>g.n?v/g.n:0),avg=cr.reduce((s,v)=>s+v,0),sp=avg/mx*100,t=d['teacher_'+k],tp=t==null?null:t/mx*100;
+ return{name:d['group_'+k],mem:(d['members_'+k]||'').split('\n').map(s=>s.trim()).filter(Boolean),n:g.n,cr,avg,sp,t,tp,f:tp==null?sp:sp*(1-w)+tp*w}}).sort((x,y)=>y.f-x.f)};
+const board=d=>calc(d).map((x,i)=>`<div class="rk ${i?'':'w'}"><i>${i+1}</i><div><b>${E(x.name)}</b><small>${T('stu')} ${x.sp.toFixed(1)}% (${x.n} ${T('votes')})</small>${x.t!=null?`<small>${T('tch')} ${x.tp.toFixed(1)}%</small>`:''}</div><em>${x.f.toFixed(1)}</em></div>`).join('');
+const lb=a=>(a||[]).map((x,i)=>`<div class=rk><i>${i+1}</i><div><b>${E(x.name)}</b><small>${E(x.grp)}</small></div><em>${x.score}</em></div>`).join('');
+
+/* ---------- Quiz view (players and projector) ---------- */
+let D,own,C,S,sig='',poll;
+setInterval(()=>{const b=$('#tb');if(b&&S&&S.q&&S.dl)b.style.width=Math.max(0,(S.dl-Date.now())/1000/S.q.t*100)+'%'},200);
+function qview(s,m){const big=m=='s';
+ if(s.phase=='lobby')return`<div class="card ctr"><h2>${E(s.title)}</h2><p>${T(big?'scan':'wait')}</p>${big?`<div id=q></div><div class=code>${C}</div>`:''}<p><b>${s.n}</b> ${T('plr')}</p></div>`;
+ if(s.phase=='end')return`<div class=card><h2>${T('fin')}</h2>${s.me&&!big?`<p>${T('rank')} ${s.me.rank}, ${s.me.score} ${T('pts')}</p>`:''}${lb(s.top)}</div>`;
+ const q=s.q,r=s.phase=='r',me=s.me&&s.me.ans;
+ let h=`<div class=card><div class=row><b>${T('qn')} ${s.qi+1}/${s.total}</b>${r?'':'<div class=bar><i id=tb></i></div>'}</div><h2 style="font-size:${big?30:22}px;margin-top:10px">${E(q.q)}</h2>`;
+ h+=q.o.map((o,i)=>`<button class="opt o${i}${r&&i==q.c?' win':''}${r&&i!=q.c?' dim':''}${me&&me.ch==i?' sel':''}" ${big||r||me?'disabled':''} data-ch=${i}><span>${SH[i]} ${E(o)}</span>${r?`<em>${s.counts[i]}</em>`:''}</button>`).join('');
+ if(big&&!r)h+=`<p>${s.ans_n}/${s.n} ${T('ans')}</p>`;
+ if(!big&&me&&!r)h+=`<p class=ok>${T('locked')}</p>`;
+ if(!big&&r)h+=`<p class="${me&&me.pts>0?'ok':''}"><b>${me?(me.pts>0?T('ok')+' +'+me.pts:T('no')):T('tu')}</b></p><p>${T('rank')} ${s.me.rank}, ${s.me.score} ${T('pts')}</p>`;
+ return h+(r?lb(s.top.slice(0,5)):'')+'</div>'}
+const stamp=s=>{s.dl=Date.now()+(s.left||0)*1000;return s};
+function qr(){const s=S,k=[s.phase,s.qi,s.n,s.ans_n,s.me&&s.me.score,s.me&&s.me.ans&&s.me.ans.ch,lang].join('|');if(k==sig)return;sig=k;app.innerHTML=qview(s,'p')}
+const qget=async()=>{S=stamp(await rpc('vq_state',{c:C,tok}));qr()};
+function qjoin(){R=qjoin;clearInterval(poll);if(S.me){R=()=>{sig='';qr()};qget();poll=setInterval(()=>qget().catch(()=>{}),1500);
+  app.onclick=async e=>{const b=e.target.closest('[data-ch]');if(!b||b.disabled)return;try{await rpc('vq_answer',{c:C,tok,ch:+b.dataset.ch});await qget()}catch(er){toast(er.message)}};return}
+ app.onclick=null;app.innerHTML=`<div class=card><h2>${E(S.title)}</h2><p>${T('qjp')}</p><input id=n type=text maxlength=40 placeholder="${T('nm')}" value="${E(localStorage.vd_n||'')}"><input id=g type=text maxlength=30 placeholder="${T('gr')}" value="${E(localStorage.vd_g||'')}"><button class=btn id=go>${T('enter')}</button></div>`;
+ $('#go').onclick=async()=>{const n=$('#n').value.trim(),g=$('#g').value.trim();if(n.length<2||!g)return toast(T('req'));try{await rpc('vq_join',{c:C,tok,nm:n,gr:g});localStorage.vd_n=n;localStorage.vd_g=g;S=stamp(await rpc('vq_state',{c:C,tok}));qjoin()}catch(e){toast(e.message)}}}
+
+/* ---------- Student ---------- */
+function join(c=''){R=()=>join($('#c')?$('#c').value:'');clearInterval(poll);app.onclick=null;
+ app.innerHTML=`<div class=card><h2>${T('joinT')}</h2><p>${T('joinP')}</p><input id=c class=digits type=text inputmode=numeric maxlength=4 placeholder="0000" value="${E(c)}" autocomplete=off><button class=btn id=go>${T('go')}</button></div>`;
+ $('#c').oninput=e=>{e.target.value=e.target.value.replace(/\D/g,'')};
+ $('#go').onclick=async()=>{const c=$('#c').value.trim();try{try{D=await rpc('vd_get',{c});own=null;R=sc;sc()}catch(e){if(!/not found/i.test(e.message))throw e;C=c;S=stamp(await rpc('vq_state',{c,tok}));qjoin()}}catch(e){toast(e.message)}};
+ if(c.length==4)$('#go').click()}
+function sc(){app.onclick=null;app.oninput=null;
+ if(D.released){app.innerHTML=`<div class=card><h2>${E(D.title)}</h2><p>${T('res')}</p>${board(D)}</div>`;return}
+ if(D.status!='open'){app.innerHTML=`<div class=card><h2>${E(D.title)}</h2><p>${T('closedP')}</p><button class="btn o" id=rf>${T('chk')}</button></div>`;$('#rf').onclick=async()=>{try{D=await rpc('vd_get',{c:D.code});sc()}catch(e){toast(e.message)}};return}
+ if(!own){app.innerHTML=`<div class=card><h2>${E(D.title)}</h2><p>${T('which')}</p><div class=row style="flex-direction:column"><button class="btn A" data-o=a>${E(D.group_a)}</button><button class="btn B" data-o=b>${E(D.group_b)}</button><button class="btn o" data-o=x>${T('aud')}</button></div></div>`;
+  app.onclick=e=>{const o=e.target.dataset.o;if(o){own=o;sc()}};return}
+ app.innerHTML=`<div class=card><h2>${E(D.title)}</h2><p>${T('scoreP')}</p></div>`+['a','b'].filter(k=>k!=own).map(k=>{
+  const done=localStorage[`vd:${D.id}:${k}`];
+  return`<div class="card team ${k=='b'?'B':''}" data-k=${k}><h2>${E(D['group_'+k])}</h2>${done?`<p class=ok>${T('done')}</p>`:D.rubric.map(r=>`<div class=crit><span>${E(r.name)}</span><output>${Math.round(r.max/2)}/${r.max}</output><input type=range min=0 max=${r.max} step=1 value=${Math.round(r.max/2)} data-m=${r.max}></div>`).join('')+`<button class="btn ${k=='b'?'B':'A'}">${T('sub2')}</button>`}</div>`}).join('');
+ app.oninput=e=>{if(e.target.type=='range')e.target.previousElementSibling.textContent=e.target.value+'/'+e.target.dataset.m};
+ app.onclick=async e=>{const b=e.target.closest('.btn'),c=b&&b.closest('.team');if(!c)return;b.disabled=true;
+  try{await rpc('vd_submit',{c:D.code,tok,g:c.dataset.k,sc:[...c.querySelectorAll('input')].map(x=>+x.value)});localStorage[`vd:${D.id}:${c.dataset.k}`]=1;toast(T('sent'));sc()}
+  catch(er){if(/already/.test(er.message)){localStorage[`vd:${D.id}:${c.dataset.k}`]=1;sc()}else{b.disabled=false}toast(er.message)}}}
+
+/* ---------- Projector screen (public, controlled from the teacher's phone) ---------- */
+function screen(c){C=c;app.className='';document.querySelector('main').classList.add('wide');clearInterval(poll);let k0='';
+ const f=async()=>{let kind='q';try{S=stamp(await rpc('vq_state',{c,tok:'-'}))}catch(e){try{S=await rpc('vd_get',{c});kind='d'}catch(er){app.innerHTML=`<div class=card>${E(er.message)}</div>`;return}}
+  const k=[kind,S.phase,S.qi,S.n,S.ans_n,S.released,S.status,lang].join('|');if(k==k0)return;k0=k;
+  if(kind=='q'){app.innerHTML=qview(S,'s');if(S.phase=='lobby')mkqr($('#q'),c,280)}
+  else if(S.released)app.innerHTML=`<div class=card><h2>${E(S.title)}</h2><p>${T('res')}</p>${board(S)}</div>`;
+  else{app.innerHTML=`<div class="card ctr"><h2>${E(S.title)}</h2><p>${E(S.group_a)} / ${E(S.group_b)}</p><p>${T('scan')}</p><div id=q></div><div class=code>${c}</div></div>`;mkqr($('#q'),c,280)}};
+ R=()=>{k0='';f()};f();poll=setInterval(f,1500)}
+
+/* ---------- Export (Excel and Word, everything in one file) ---------- */
+const r2=v=>Math.round(v*100)/100;
+const rowsD=d=>calc(d).map((x,i)=>{const o={Debate:d.title,Rank:i+1,Group:x.name,Members:x.mem.join(', '),Votes:x.n};d.rubric.forEach((r,j)=>o[`${r.name} (/${r.max})`]=r2(x.cr[j]));return{...o,'Peer total':r2(x.avg),'Peer %':r2(x.sp),'Teacher score':x.t??'','Teacher %':x.tp==null?'':r2(x.tp),'Teacher weight %':d.w_teacher,'Final %':r2(x.f)}});
+const rowsM=d=>calc(d).flatMap(x=>x.mem.map(m=>({Debate:d.title,Group:x.name,Student:m})));
+const rowsQ=z=>z.players.map((p,i)=>{const o={Quiz:z.title,Rank:i+1,Name:p.name,Group:p.grp,Score:p.score};z.questions.forEach((_,j)=>{const a=p.ans.find(a=>a.qi==j);o['Q'+(j+1)]=a?a.pts:0});return o});
+const dl=(b,n)=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),3000)};
+const tb=r=>r.length?'<table><tr>'+Object.keys(r[0]).map(k=>`<th>${E(k)}</th>`).join('')+'</tr>'+r.map(o=>'<tr>'+Object.values(o).map(v=>`<td>${E(v)}</td>`).join('')+'</tr>').join('')+'</table>':'';
+function ex(f,ds,qs){const n='verdict-'+new Date().toISOString().slice(0,10);if(!ds.length&&!qs.length)return toast(T('none'));
+ if(f=='x'){if(!window.XLSX)return toast('Excel library not loaded. Check your connection.');const wb=XLSX.utils.book_new(),add=(r,s)=>r.length&&XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(r),s.replace(/[\\\/?*\[\]:]/g,'').slice(0,31));
+  add(ds.flatMap(rowsD),'Assessment');add(ds.flatMap(rowsM),'Members');qs.forEach((z,i)=>add(rowsQ(z),`Quiz ${i+1} ${z.title}`));XLSX.writeFile(wb,n+'.xlsx')}
+ else{let h='<h1>Verdict</h1>';ds.forEach(d=>h+=`<h2>${E(d.title)}</h2>`+tb(rowsD(d))+(rowsM(d).length?`<h3>${T('mems')}</h3>`+tb(rowsM(d)):''));qs.forEach(z=>h+=`<h2>${E(z.title)}</h2>`+tb(rowsQ(z)));
+  dl(new Blob(['\ufeff<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><style>body{font-family:Calibri,Tahoma,Arial}table{border-collapse:collapse;margin-bottom:14px}td,th{border:1px solid #888;padding:4px 8px}th{background:#0d1b2a;color:#fff}</style></head><body dir="'+(lang=='ku'?'rtl':'ltr')+'">'+h+'</body></html>'],{type:'application/msword'}),n+'.doc')}}
+
+/* ---------- Teacher ---------- */
+let P=sessionStorage.vp||'',L=[],Q=[],tab='a',tp;
+const load=async()=>{[L,Q]=await Promise.all([rpc('vd_list',{p:P}),rpc('vq_list',{p:P}).catch(()=>[])])};
+function login(){R=login;app.onclick=null;app.innerHTML=`<div class=card><h2>${T('tp')}</h2><p>${T('pass')}</p><input id=p type=password autocomplete=current-password><button class=btn id=go>${T('in')}</button></div>`;
+ $('#go').onclick=async()=>{P=$('#p').value;try{await load();sessionStorage.vp=P;dash()}catch(e){toast(e.message)}}}
+const dcard=d=>{const mx=d.rubric.reduce((s,r)=>s+r.max,0);return`<div class=card data-id=${d.id}><div class=row><h2>${E(d.title)}</h2><span class="tag ${d.status=='open'?'on':''}">${d.status=='open'?T('open'):T('cl')}</span></div>
+<p>${E(d.group_a)} / ${E(d.group_b)}</p><div class=code>${d.code}</div>
+<div class=row><button class="btn s" data-a=qr>${T('qr')}</button><button class="btn o s" data-a=tg>${d.status=='open'?T('close'):T('reopen')}</button><button class="btn o s" data-a=rel>${d.released?T('hide'):T('rel')}</button></div>
+<p style="margin-top:14px">${T('ys')} ${mx}</p><div class=row><input type=number class=ta min=0 max=${mx} placeholder="${E(d.group_a)}" value="${d.teacher_a??''}"><input type=number class=tb min=0 max=${mx} placeholder="${E(d.group_b)}" value="${d.teacher_b??''}"></div>
+<p>${T('wt')}: <b class=wv>${d.w_teacher}</b>% ${T('tch')}, <b class=sv>${100-d.w_teacher}</b>% ${T('stu')}</p><input type=range class=w min=0 max=100 step=5 value=${d.w_teacher} style="width:100%;accent-color:#0d1b2a"><br><br>
+<p style="margin:0 0 6px">${T('mems')}</p><div class=row><textarea class=ma placeholder="${E(d.group_a)}">${E(d.members_a)}</textarea><textarea class=mb placeholder="${E(d.group_b)}">${E(d.members_b)}</textarea></div>
+<div class=row><button class="btn s" data-a=save>${T('save')}</button><button class="btn o s" data-a=xD>${T('xl')}</button><button class="btn o s" data-a=wD>${T('wd')}</button><button class="btn o s" data-a=del>${T('del')}</button></div>
+<div class=bd style="margin-top:12px"></div></div>`};
+const qcard=z=>`<div class=card data-qid=${z.id}><div class=row><h2>${E(z.title)}</h2><span class="tag on qp"></span></div><div class=code>${z.code}</div>
+<div class=row><button class="btn o s" data-a=qqr>${T('qr')}</button><button class="btn o s" data-a=qscr>${T('scr')}</button></div><br><button class="btn A" data-a=qgo></button><div class=qb></div>
+<div class=row style="margin-top:12px"><button class="btn o s" data-a=xQ>${T('xl')}</button><button class="btn o s" data-a=wQ>${T('wd')}</button><button class="btn o s" data-a=qend>${T('last')}</button><button class="btn o s" data-a=qdel>${T('del')}</button></div></div>`;
+function paint(){L.forEach(d=>{const c=document.querySelector(`[data-id="${d.id}"]`);if(c)c.querySelector('.bd').innerHTML=`<p style="margin:0">${T('live')}: ${d.a.n} / ${d.b.n} ${T('votes')}</p>`+board(d)});
+ Q.forEach(z=>{const c=document.querySelector(`[data-qid="${z.id}"]`);if(!c)return;const last=z.qi+1>=z.questions.length,g=c.querySelector('[data-a=qgo]');
+  c.querySelector('.qp').textContent=T('ph_'+z.phase);g.textContent={lobby:T('start'),q:T('reveal'),r:last?T('last'):T('next'),end:T('ph_end')}[z.phase];g.disabled=z.phase=='end';
+  c.querySelector('.qb').innerHTML=`<p style="margin:10px 0 0">${z.players.length} ${T('plr')}${z.phase=='lobby'?'':`, ${T('qn')} ${z.qi+1}/${z.questions.length}`}</p>`+lb(z.players.slice(0,10))})}
+function dash(){R=dash;clearInterval(tp);
+ const fd=`<div class=card><h2>${T('newD')}</h2><input id=t type=text placeholder="${T('ttl')}"><div class=row><input id=ga type=text placeholder="${T('ga')}"><input id=gb type=text placeholder="${T('gb')}"></div><p style="margin:0 0 6px">${T('mem')}</p><div class=row><textarea id=ma></textarea><textarea id=mb></textarea></div><p style="margin:0 0 6px">${T('rub')}</p><textarea id=r>Arguments, 10\nRebuttal, 10\nEvidence, 10\nDelivery, 10</textarea><button class=btn id=mk>${T('mk')}</button></div>`;
+ const fq=`<div class=card><h2>${T('newQ')}</h2><input id=qt2 type=text placeholder="${T('ttl')}"><p style="margin:0 0 6px">${T('qf')}</p><textarea id=qq style="min-height:140px">What is the capital of Iraq? | Erbil | Baghdad | Basra | Mosul | 2</textarea><input id=qs type=number value=20 min=5 max=120 placeholder="${T('secs')}"><p style="margin:-4px 0 12px">${T('secs')}</p><button class=btn id=mkq>${T('mkQ')}</button></div>`;
+ app.innerHTML=`<div class=row style="margin-bottom:12px"><button class="btn ${tab=='a'?'':'o'}" data-t=a>${T('tabA')}</button><button class="btn ${tab=='q'?'':'o'}" data-t=q>${T('tabQ')}</button></div>`+(tab=='a'?fd+L.map(dcard).join(''):fq+Q.map(qcard).join(''))+`<div class=row><button class="btn o s" data-a=xall>${T('all')} (${T('xl')})</button><button class="btn o s" data-a=wall>${T('all')} (${T('wd')})</button><button class="btn o s" id=out>${T('out')}</button></div>`;
+ paint();tp=setInterval(async()=>{if(document.hidden||!$('#out'))return;try{await load();paint()}catch{}},3000);
+ app.oninput=e=>{if(e.target.classList.contains('w')){const c=e.target.closest('.card');c.querySelector('.wv').textContent=e.target.value;c.querySelector('.sv').textContent=100-e.target.value}};
+ const re=async()=>{try{await load();dash()}catch(er){toast(er.message)}};
+ app.onclick=async e=>{const t=e.target,a=t.dataset.a,id=t.id;
+  if(t.dataset.t){tab=t.dataset.t;return dash()}
+  if(id=='out'){sessionStorage.vp=P='';clearInterval(tp);return login()}
+  if(id=='mk'){const rub=$('#r').value.split('\n').map(l=>l.split(',')).filter(a=>a[0].trim()&&+a[1]>0).map(a=>({name:a[0].trim(),max:+a[1]}));
+   if(!$('#t').value.trim()||!$('#ga').value.trim()||!$('#gb').value.trim()||!rub.length)return toast(T('bad'));
+   try{await rpc('vd_create',{p:P,t:$('#t').value.trim(),ga:$('#ga').value.trim(),gb:$('#gb').value.trim(),rub,ma:$('#ma').value,mb:$('#mb').value});await re()}catch(er){toast(er.message)}return}
+  if(id=='mkq'){const sec=+$('#qs').value||20,qs=$('#qq').value.split('\n').map(l=>l.split('|').map(s=>s.trim())).filter(a=>a.length>=4&&a[0]).map(a=>{const c=+a.pop()-1;return{q:a[0],o:a.slice(1),c,t:sec}}).filter(x=>x.o.length>=2&&x.o.length<=4&&x.c>=0&&x.c<x.o.length);
+   if(!$('#qt2').value.trim()||!qs.length)return toast(T('badQ'));try{await rpc('vq_create',{p:P,t:$('#qt2').value.trim(),qs});await re()}catch(er){toast(er.message)}return}
+  if(a=='xall')return ex('x',L,Q);if(a=='wall')return ex('w',L,Q);
+  const c=t.closest('.card[data-id]'),z=t.closest('.card[data-qid]');
+  if(c){const d=L.find(x=>x.id==c.dataset.id),up=async p=>{try{await rpc('vd_update',{p:P,i:d.id,patch:p});await re()}catch(er){toast(er.message)}};
+   if(a=='qr'){const o=document.createElement('div');o.className='ov';o.innerHTML=`<h2 style="font-size:28px">${E(d.title)}</h2><div id=q style="margin:18px"></div><p>${T('scan')}</p><div class=code style="font-size:72px">${d.code}</div>`;o.onclick=()=>o.remove();document.body.append(o);const w=Math.min(300,innerWidth-80);mkqr($('#q'),d.code,w)}
+   if(a=='tg')up({status:d.status=='open'?'closed':'open'});if(a=='rel')up({released:!d.released});
+   if(a=='save'){const v=s=>c.querySelector(s).value;up({ta:v('.ta')===''?null:+v('.ta'),tb:v('.tb')===''?null:+v('.tb'),w:+v('.w'),ma:v('.ma'),mb:v('.mb')})}
+   if(a=='xD')ex('x',[d],[]);if(a=='wD')ex('w',[d],[]);
+   if(a=='del'&&confirm(T('conf'))){try{await rpc('vd_delete',{p:P,i:d.id});await re()}catch(er){toast(er.message)}}}
+  if(z){const q=Q.find(x=>x.id==z.dataset.qid),ctl=async act=>{try{await rpc('vq_ctl',{p:P,i:q.id,act});await load();paint()}catch(er){toast(er.message)}};
+   if(a=='qqr'){const o=document.createElement('div');o.className='ov';o.innerHTML=`<h2 style="font-size:28px">${E(q.title)}</h2><div id=q style="margin:18px"></div><p>${T('scan')}</p><div class=code style="font-size:72px">${q.code}</div>`;o.onclick=()=>o.remove();document.body.append(o);mkqr($('#q'),q.code,Math.min(300,innerWidth-80))}
+   if(a=='qscr'){const u=location.origin+location.pathname+'#screen='+q.code;try{await navigator.clipboard.writeText(u);toast(T('copied'))}catch{prompt('',u)}}
+   if(a=='qgo'){const act={lobby:'start',q:'reveal',r:'next'}[q.phase];if(act)ctl(act)}
+   if(a=='qend')ctl('end');if(a=='xQ')ex('x',[],[q]);if(a=='wQ')ex('w',[],[q]);
+   if(a=='qdel'&&confirm(T('conf'))){try{await rpc('vq_delete',{p:P,i:q.id});await re()}catch(er){toast(er.message)}}}}}
+
+/* ---------- Start ---------- */
+applyL();
+if('serviceWorker'in navigator&&location.protocol!='file:')navigator.serviceWorker.register('sw.js');
+addEventListener('hashchange',()=>location.reload());
+if(location.hash.startsWith('#screen='))screen(location.hash.slice(8));
+else if(location.hash=='#teacher'){P?load().then(dash).catch(login):login()}
+else join(new URLSearchParams(location.search).get('c')||'');
+</script></body></html>
