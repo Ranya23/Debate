@@ -22,7 +22,13 @@ en: {
   plr:'players', qn:'Question', ph_lobby:'Waiting for players', ph_q:'Question open', ph_r:'Answer shown', ph_end:'Finished', scan:'Scan the QR, then enter the code', ans:'answered',
   newF:'New feedback form', fq:'Question for the students', fph:'Write your feedback (anonymous, maximum 500 words)', send:'Send', words:'words', fsent:'Thank you. Your feedback was sent anonymously.', fclosed:'This form is closed.', resp:'responses',
   newS:'New text or link to share', body:'Text or link', copyBtn:'Copy text', openL:'Open link',
-  xl:'Excel', wd:'Word', all:'Export everything', none:'Nothing to export yet.', bad:'Add a title, both group names, at least one criterion and a total mark.', badQ:'Add a title and at least one valid question.', badF:'Add a title and some text.'
+  xl:'Excel', wd:'Word', all:'Export everything', none:'Nothing to export yet.', bad:'Add a title, both group names, at least one criterion and a total mark.', badQ:'Add a title and at least one valid question.', badF:'Add a title and some text.',
+  styleD:'Debate (rubric)', styleM:'By members', styleP:'Presenter', evalM:'Members', evalP:'Presenter',
+  newM:'New evaluation by members', newPr:'New presenter evaluation', pname:'Presenter name',
+  gmf:'One group per line: Group name: member, member, member', mkM:'Create evaluation and code',
+  badM:'Add a title, a total mark and every group with its members (format: Group name: member, member).',
+  scoreMembers:'Score every member on their own performance in the debate, then send once. Each mark is', scorePerson:'Score the presenter, then send. The mark is',
+  outOf:'out of', sendAll:'Send scores', pollRes:'Poll results'
 },
 ku: {
   sub:'هەڵسەنگاندنی هاوڕێیان، کویز، ڕاپرسی و فیدباک', back:'گەڕانەوە',
@@ -46,5 +52,11 @@ ku: {
   plr:'یاریزان', qn:'پرسیار', ph_lobby:'چاوەڕێی یاریزانان', ph_q:'پرسیار کراوەیە', ph_r:'وەڵام پیشاندرا', ph_end:'کۆتایی هات', scan:'QR سکان بکە، پاشان کۆدەکە بنووسە', ans:'وەڵامیان داوە',
   newF:'فۆرمی فیدباکی نوێ', fq:'پرسیار بۆ قوتابیان', fph:'فیدباکەکەت بنووسە (نەناسراو، زۆرترین ٥٠٠ وشە)', send:'ناردن', words:'وشە', fsent:'سوپاس. فیدباکەکەت بە شێوەی نەناسراو نێردرا.', fclosed:'ئەم فۆرمە داخراوە.', resp:'وەڵام',
   newS:'دەق یان لینکی نوێ بۆ هاوبەشکردن', body:'دەق یان لینک', copyBtn:'کۆپیکردنی دەق', openL:'کردنەوەی لینک',
-  xl:'ئێکسڵ', wd:'وۆرد', all:'دابەزاندنی هەموو شتێک', none:'هێشتا هیچ شتێک نییە بۆ دابەزاندن.', bad:'ناونیشان، ناوی هەردوو گرووپ، بەلایەنی کەمەوە یەک پێوەر و نمرەی گشتی زیاد بکە.', badQ:'ناونیشان و بەلایەنی کەمەوە یەک پرسیاری دروست زیاد بکە.', badF:'ناونیشان و دەقێک زیاد بکە.'
+  xl:'ئێکسڵ', wd:'وۆرد', all:'دابەزاندنی هەموو شتێک', none:'هێشتا هیچ شتێک نییە بۆ دابەزاندن.', bad:'ناونیشان، ناوی هەردوو گرووپ، بەلایەنی کەمەوە یەک پێوەر و نمرەی گشتی زیاد بکە.', badQ:'ناونیشان و بەلایەنی کەمەوە یەک پرسیاری دروست زیاد بکە.', badF:'ناونیشان و دەقێک زیاد بکە.',
+  styleD:'مناقەشە (پێوەر)', styleM:'بەپێی ئەندامان', styleP:'پێشکەشکار', evalM:'ئەندامان', evalP:'پێشکەشکار',
+  newM:'هەڵسەنگاندنی نوێ بەپێی ئەندامان', newPr:'هەڵسەنگاندنی پێشکەشکاری نوێ', pname:'ناوی پێشکەشکار',
+  gmf:'هەر گرووپێک لە دێڕێک: ناوی گرووپ: ئەندام، ئەندام، ئەندام', mkM:'دروستکردنی هەڵسەنگاندن و کۆد',
+  badM:'ناونیشان، نمرەی گشتی و هەموو گرووپەکان لەگەڵ ئەندامەکانیان زیاد بکە (شێواز: ناوی گرووپ: ئەندام، ئەندام).',
+  scoreMembers:'هەر ئەندامێک بەپێی ئەدای خۆی لە مناقەشەکەدا نمرە بدە، پاشان جارێک بینێرە. هەر نمرەیەک', scorePerson:'پێشکەشکار نمرە بدە، پاشان بینێرە. نمرەکە',
+  outOf:'لە', sendAll:'ناردنی نمرەکان', pollRes:'ئەنجامی ڕاپرسی'
 }};
