@@ -55,4 +55,7 @@ input:focus,textarea:focus,button:focus-visible{outline:3px solid #1f5eff55;bord
 .pt i{display:block;height:100%;border-radius:9px;animation:grow .9s ease both}
 .pr.top .pl b{background:#d6f5ea;color:#0b6b4d;border-radius:99px;padding:0 10px}
 @keyframes grow{from{width:0}}
+.tag.own{background:#e7ecff;color:#1f3fae}
+select{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:#fff;margin-bottom:12px;font:inherit;color:inherit}
+select:focus{outline:3px solid #1f5eff55;border-color:var(--A)}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}

@@ -28,7 +28,14 @@ en: {
   gmf:'One group per line: Group name: member, member, member', mkM:'Create evaluation and code',
   badM:'Add a title, a total mark and every group with its members (format: Group name: member, member).',
   scoreMembers:'Score every member on their own performance in the debate, then send once. Each mark is', scorePerson:'Score the presenter, then send. The mark is',
-  outOf:'out of', sendAll:'Send scores', pollRes:'Poll results'
+  outOf:'out of', sendAll:'Send scores', pollRes:'Poll results',
+  tabT:'Teachers', tabAcc:'Account', user:'Username', userHint:'Username (teachers only; leave empty if you are the owner)',
+  newT:'New teacher account', tname:'Full name', tuser:'Username (letters, numbers, dots, dashes)', tpass:'Passcode (at least 6 characters)', mkT:'Create account',
+  active:'Active', disabled:'Disabled', disable:'Disable', enable:'Enable', resetP:'Reset passcode', newPass:'New passcode (at least 6 characters)',
+  delT:'Delete account', delTConf:'Delete this account? Their debates, quizzes and forms are kept and move to you.',
+  tDeb:'assessments', tQuiz:'quizzes and polls', tForm:'forms',
+  owner:'Owner', ownerRole:'Owner', mine:'Mine', allT:'All teachers', myAcc:'My account', chgP:'Change my passcode', passSaved:'Passcode saved', accMade:'Account created', signedAs:'Signed in as',
+  badT:'Enter a name, a username (3 to 30 letters, numbers, dots or dashes) and a passcode of at least 6 characters.', badP:'The passcode must have at least 6 characters.'
 },
 ku: {
   sub:'هەڵسەنگاندنی هاوڕێیان، کویز، ڕاپرسی و فیدباک', back:'گەڕانەوە',
@@ -58,5 +65,12 @@ ku: {
   gmf:'هەر گرووپێک لە دێڕێک: ناوی گرووپ: ئەندام، ئەندام، ئەندام', mkM:'دروستکردنی هەڵسەنگاندن و کۆد',
   badM:'ناونیشان، نمرەی گشتی و هەموو گرووپەکان لەگەڵ ئەندامەکانیان زیاد بکە (شێواز: ناوی گرووپ: ئەندام، ئەندام).',
   scoreMembers:'هەر ئەندامێک بەپێی ئەدای خۆی لە مناقەشەکەدا نمرە بدە، پاشان جارێک بینێرە. هەر نمرەیەک', scorePerson:'پێشکەشکار نمرە بدە، پاشان بینێرە. نمرەکە',
-  outOf:'لە', sendAll:'ناردنی نمرەکان', pollRes:'ئەنجامی ڕاپرسی'
+  outOf:'لە', sendAll:'ناردنی نمرەکان', pollRes:'ئەنجامی ڕاپرسی',
+  tabT:'مامۆستایان', tabAcc:'هەژمار', user:'ناوی بەکارهێنەر', userHint:'ناوی بەکارهێنەر (تەنها مامۆستایان؛ ئەگەر خاوەنی سیستەمەکەیت بەتاڵی بهێڵەرەوە)',
+  newT:'هەژماری مامۆستای نوێ', tname:'ناوی تەواو', tuser:'ناوی بەکارهێنەر (پیت، ژمارە، خاڵ، هێڵ)', tpass:'وشەی نهێنی (لانیکەم ٦ نووسە)', mkT:'دروستکردنی هەژمار',
+  active:'چالاک', disabled:'ڕاگیراو', disable:'ڕاگرتن', enable:'چالاککردنەوە', resetP:'گۆڕینی وشەی نهێنی', newPass:'وشەی نهێنی نوێ (لانیکەم ٦ نووسە)',
+  delT:'سڕینەوەی هەژمار', delTConf:'دڵنیایت لە سڕینەوەی ئەم هەژمارە؟ مناقەشە، کویز و فۆرمەکانی دەمێننەوە و دەگوازرێنەوە بۆ تۆ.',
+  tDeb:'هەڵسەنگاندن', tQuiz:'کویز و ڕاپرسی', tForm:'فۆرم',
+  owner:'خاوەن', ownerRole:'خاوەن', mine:'هی من', allT:'هەموو مامۆستایان', myAcc:'هەژماری من', chgP:'گۆڕینی وشەی نهێنی من', passSaved:'وشەی نهێنی پاشەکەوت کرا', accMade:'هەژمار دروست کرا', signedAs:'چوویتە ژوورەوە وەک',
+  badT:'ناوێک، ناوی بەکارهێنەرێک (٣ بۆ ٣٠ پیت، ژمارە، خاڵ یان هێڵ) و وشەی نهێنییەک بە لانیکەم ٦ نووسە بنووسە.', badP:'وشەی نهێنی دەبێت لانیکەم ٦ نووسە بێت.'
 }};

@@ -388,27 +388,44 @@ function exportData(format, src) {
 }
 
 /* ================= Teacher ================= */
-let P = sessionStorage.vp || '', L = [], Q = [], FI = [], MS = [], tab = 'a', astyle = 'd';
+let P = sessionStorage.vp || '', L = [], Q = [], FI = [], MS = [], TS = [], tab = 'a', astyle = 'd', ofilter = 'all';
 const TABS = [['a', 'tabA'], ['q', 'tabQ'], ['p', 'tabP'], ['f', 'tabF'], ['s', 'tabS']];
+// Who is signed in. The owner signs in with the passcode alone; a teacher with username + passcode.
+// legacy = schema_v5.sql is not installed yet, so the app behaves exactly as before (owner only).
+let ME = { admin: true, legacy: true, name: '' };
+const SEP = '\u001f';   // separates username and passcode in a teacher's login
+const tabsFor = () => ME.legacy ? TABS : [...TABS, ['t', ME.admin ? 'tabT' : 'tabAcc']];
+const ownTag = x => (ME.admin && !ME.legacy && x.owner) ? `<span class="tag own">${E(x.owner)}</span>` : '';
+const visible = x => ofilter === 'all' || (ofilter === 'mine' ? !x.owner_id : x.owner_id === ofilter);
 const load = async () => {
   [L, Q, FI, MS] = await Promise.all([rpc('vd_list', { p: P }), rpc('vq_list', { p: P }).catch(() => []), rpc('vf_list', { p: P }).catch(() => []), rpc('vm_list', { p: P }).catch(() => [])]);
+  if (tab === 't' && ME.admin && !ME.legacy) TS = await rpc('vt_list', { p: P });
 };
 const reload = async () => { try { await load(); draw(); } catch (e) { toast(e.message); } };
+async function boot() {
+  ME = await rpc('vt_me', { p: P }).catch(e => (/Wrong|disabled/i.test(e.message) ? Promise.reject(e) : null)) || { admin: true, legacy: true, name: '' };
+  await load();
+}
 
 function vTeacher() {
   if (!P) return vLogin();
-  load().then(() => repl(vDash)).catch(() => { P = ''; sessionStorage.vp = ''; vLogin(); });
+  boot().then(() => repl(vDash)).catch(() => { P = ''; sessionStorage.vp = ''; vLogin(); });
 }
 function vLogin() {
-  app.innerHTML = `<div class="card"><h2>${T('tp')}</h2><p>${T('pass')}</p><input id="p" type="password" autocomplete="current-password"><button class="btn" id="go">${T('in')}</button></div>`;
-  $('#go').onclick = async () => { P = $('#p').value; try { await load(); sessionStorage.vp = P; repl(vDash); } catch (e) { toast(e.message); } };
+  app.innerHTML = `<div class="card"><h2>${T('tp')}</h2><p>${T('userHint')}</p><input id="u" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="${T('user')}">
+    <p>${T('pass')}</p><input id="p" type="password" autocomplete="current-password"><button class="btn" id="go">${T('in')}</button></div>`;
+  $('#go').onclick = async () => {
+    const u = $('#u').value.trim().toLowerCase();
+    P = u ? u + SEP + $('#p').value : $('#p').value;
+    try { await boot(); sessionStorage.vp = P; repl(vDash); } catch (e) { P = ''; toast(e.message); }
+  };
 }
 
 /* ----- Cards ----- */
 const teacherMax = (total, w) => f2(total * w / 100);
 const debateCard = d => {
   const mx = teacherMax(d.total_mark, d.w_teacher);
-  return `<div class="card" data-id="${d.id}"><div class="row"><h2>${E(d.title)}</h2><span class="tag ${d.status === 'open' ? 'on' : ''}">${d.status === 'open' ? T('open') : T('cl')}</span></div>
+  return `<div class="card" data-id="${d.id}"><div class="row"><h2>${E(d.title)}</h2>${ownTag(d)}<span class="tag ${d.status === 'open' ? 'on' : ''}">${d.status === 'open' ? T('open') : T('cl')}</span></div>
   <p>${E(d.group_a)} / ${E(d.group_b)}</p><div class="code">${d.code}</div>
   <div class="row"><button class="btn s" data-a="qr">${T('qr')}</button><button class="btn o s" data-a="link">${T('scr')}</button>
   <button class="btn o s" data-a="tg">${d.status === 'open' ? T('close') : T('reopen')}</button><button class="btn o s" data-a="rel">${d.released ? T('hide') : T('rel')}</button></div>
@@ -421,11 +438,11 @@ const debateCard = d => {
   <div class="row"><button class="btn s" data-a="save">${T('save')}</button><button class="btn o s" data-a="again">${T('again')}</button><button class="btn o s" data-a="xl">${T('xl')}</button><button class="btn o s" data-a="wd">${T('wd')}</button><button class="btn o s" data-a="del">${T('del')}</button></div>
   <div class="live" style="margin-top:12px"></div></div>`;
 };
-const quizCard = z => `<div class="card" data-qid="${z.id}"><div class="row"><h2>${E(z.title)}</h2><span class="tag on qp"></span></div><div class="code">${z.code}</div>
+const quizCard = z => `<div class="card" data-qid="${z.id}"><div class="row"><h2>${E(z.title)}</h2>${ownTag(z)}<span class="tag on qp"></span></div><div class="code">${z.code}</div>
   <div class="row"><button class="btn o s" data-a="qr">${T('qr')}</button><button class="btn o s" data-a="link">${T('scr')}</button></div><br>
   <button class="btn A" data-a="go"></button><div class="live"></div>
   <div class="row" style="margin-top:12px"><button class="btn o s" data-a="xl">${T('xl')}</button><button class="btn o s" data-a="wd">${T('wd')}</button><button class="btn o s" data-a="end">${T('last')}</button><button class="btn o s" data-a="again">${T('again')}</button><button class="btn o s" data-a="del">${T('del')}</button></div></div>`;
-const formCard = f => `<div class="card" data-fid="${f.id}"><div class="row"><h2>${E(f.title)}</h2>${f.kind === 'feedback' ? `<span class="tag ${f.open ? 'on' : ''}">${f.open ? T('open') : T('cl')}</span>` : ''}</div>
+const formCard = f => `<div class="card" data-fid="${f.id}"><div class="row"><h2>${E(f.title)}</h2>${ownTag(f)}${f.kind === 'feedback' ? `<span class="tag ${f.open ? 'on' : ''}">${f.open ? T('open') : T('cl')}</span>` : ''}</div>
   <div class="code">${f.code}</div><div class="row"><button class="btn o s" data-a="qr">${T('qr')}</button><button class="btn o s" data-a="link">${T('scr')}</button>${f.kind === 'feedback' ? `<button class="btn o s" data-a="tgf">${f.open ? T('close') : T('reopen')}</button>` : ''}</div>
   ${f.kind === 'copy' ? `<div class="share">${E(f.body)}</div>` : `<p style="margin-top:10px"><b>${f.responses.length}</b> ${T('resp')}</p><div class="scroll">${f.responses.map(r => `<div class="resp">${E(r.body)}</div>`).join('')}</div>`}
   <div class="row" style="margin-top:12px">${f.kind === 'feedback' ? `<button class="btn o s" data-a="xl">${T('xl')}</button><button class="btn o s" data-a="wd">${T('wd')}</button>` : ''}<button class="btn o s" data-a="again">${T('again')}</button><button class="btn o s" data-a="del">${T('del')}</button></div></div>`;
@@ -469,7 +486,7 @@ const evalCard = m => {
     prev = p.grp;
     return `${head}<div class="row"><span style="flex:2">${E(p.name)}</span><input type="number" class="tt" data-i="${i}" min="0" max="${mx}" step="any" value="${p.teacher ?? ''}"></div>`;
   }).join('');
-  return `<div class="card" data-mid="${m.id}" data-total="${N}"><div class="row"><h2>${E(m.title)}</h2><span class="tag ${m.status === 'open' ? 'on' : ''}">${m.status === 'open' ? T('open') : T('cl')}</span></div>
+  return `<div class="card" data-mid="${m.id}" data-total="${N}"><div class="row"><h2>${E(m.title)}</h2>${ownTag(m)}<span class="tag ${m.status === 'open' ? 'on' : ''}">${m.status === 'open' ? T('open') : T('cl')}</span></div>
   <p>${T(m.style === 'person' ? 'evalP' : 'evalM')}, ${T('total')} ${f2(N)}</p><div class="code">${m.code}</div>
   <div class="row"><button class="btn s" data-a="qr">${T('qr')}</button><button class="btn o s" data-a="link">${T('scr')}</button>
   <button class="btn o s" data-a="tg">${m.status === 'open' ? T('close') : T('reopen')}</button><button class="btn o s" data-a="rel">${m.released ? T('hide') : T('rel')}</button></div>
@@ -515,10 +532,41 @@ function paintLive() {
     c.querySelector('.live').innerHTML = h;
   });
 }
+/* ----- Teacher accounts (owner manages them; every account can change its own passcode) ----- */
+const ownerOptions = () => {
+  const m = new Map();
+  [...L, ...Q, ...FI, ...MS].forEach(x => { if (x.owner_id) m.set(x.owner_id, x.owner); });
+  TS.forEach(t => m.set(t.id, t.name));
+  return [...m];
+};
+const filterBar = () => {
+  if (!ME.admin || ME.legacy) return '';
+  const opts = ownerOptions();
+  if (!opts.length) return '';
+  return `<select id="of" aria-label="${T('allT')}"><option value="all">${T('allT')}</option><option value="mine" ${ofilter === 'mine' ? 'selected' : ''}>${T('mine')}</option>` +
+    opts.map(([id, n]) => `<option value="${id}" ${ofilter === id ? 'selected' : ''}>${E(n)}</option>`).join('') + '</select>';
+};
+const accountCard = () => `<div class="card"><h2>${T('myAcc')}</h2><p>${ME.admin ? T('ownerRole') : E(ME.name)}</p>
+  <input id="mp" type="text" autocomplete="off" placeholder="${T('newPass')}"><button class="btn" id="chgp">${T('chgP')}</button></div>`;
+const teacherCard = t => `<div class="card" data-tid="${t.id}"><div class="row"><h2>${E(t.name)}</h2><span class="tag ${t.active ? 'on' : ''}">${t.active ? T('active') : T('disabled')}</span></div>
+  <p>${E(t.username)}: ${t.debates} ${T('tDeb')}, ${t.quizzes} ${T('tQuiz')}, ${t.forms} ${T('tForm')}</p>
+  <input type="text" class="np" autocomplete="off" placeholder="${T('newPass')}">
+  <div class="row"><button class="btn s" data-a="tReset">${T('resetP')}</button><button class="btn o s" data-a="tTog">${t.active ? T('disable') : T('enable')}</button><button class="btn o s" data-a="tDel">${T('delT')}</button></div></div>`;
+const teachersPanel = () => ME.admin
+  ? `<div class="card"><h2>${T('newT')}</h2><input id="tn" type="text" placeholder="${T('tname')}"><input id="tu" type="text" autocapitalize="none" spellcheck="false" placeholder="${T('tuser')}">
+      <input id="tp" type="text" autocomplete="off" placeholder="${T('tpass')}"><button class="btn" id="mkt">${T('mkT')}</button></div>` + TS.map(teacherCard).join('') + accountCard()
+  : accountCard();
+
 function vDash() {
-  const list = tab === 'a' ? [...L.map(debateCard), ...MS.map(evalCard)] : tab === 'q' || tab === 'p' ? Q.filter(z => z.kind === (tab === 'q' ? 'quiz' : 'poll')).map(quizCard) : FI.filter(f => f.kind === (tab === 'f' ? 'feedback' : 'copy')).map(formCard);
-  app.innerHTML = `<div class="tabs">${TABS.map(([k, label]) => `<button class="btn ${tab === k ? '' : 'o'}" data-tab="${k}">${T(label)}</button>`).join('')}</div>${forms[tab]()}${list.join('')}
-    <div class="row"><button class="btn o s" data-a="xlAll">${T('all')} (${T('xl')})</button><button class="btn o s" data-a="wdAll">${T('all')} (${T('wd')})</button><button class="btn o s" data-a="out">${T('out')}</button></div>`;
+  if (tab === 't' && !tabsFor().some(([k]) => k === 't')) tab = 'a';
+  if (!['all', 'mine'].includes(ofilter) && !ownerOptions().some(([id]) => id === ofilter)) ofilter = 'all';
+  const list = tab === 'a' ? [...L.filter(visible).map(debateCard), ...MS.filter(visible).map(evalCard)]
+    : tab === 'q' || tab === 'p' ? Q.filter(z => visible(z) && z.kind === (tab === 'q' ? 'quiz' : 'poll')).map(quizCard)
+    : FI.filter(f => visible(f) && f.kind === (tab === 'f' ? 'feedback' : 'copy')).map(formCard);
+  const body = tab === 't' ? teachersPanel() : filterBar() + forms[tab]() + list.join('');
+  const who = ME.legacy ? '' : `<span class="tag">${T('signedAs')} ${E(ME.admin ? T('ownerRole') : ME.name)}</span>`;
+  app.innerHTML = `<div class="tabs">${tabsFor().map(([k, label]) => `<button class="btn ${tab === k ? '' : 'o'}" data-tab="${k}">${T(label)}</button>`).join('')}</div>${body}
+    <div class="row"><button class="btn o s" data-a="xlAll">${T('all')} (${T('xl')})</button><button class="btn o s" data-a="wdAll">${T('all')} (${T('wd')})</button>${who}<button class="btn o s" data-a="out">${T('out')}</button></div>`;
   paintLive();
   every(async () => { if (document.hidden) return; try { await load(); paintLive(); } catch {} }, 3000);
   app.oninput = onTeacherInput;
@@ -528,6 +576,7 @@ function vDash() {
 // Keep the teacher's allowed maximum in step with total mark and weight; never let a mark exceed it.
 function onTeacherInput(e) {
   const t = e.target, c = t.closest('.card');
+  if (t.id === 'of') { ofilter = t.value; return vDash(); }
   if (t.id === 'w') $('#wv').textContent = t.value;
   if (!c || !(c.dataset.id || c.dataset.mid)) return;
   if (t.classList.contains('w') || t.classList.contains('tm')) {
@@ -544,11 +593,23 @@ function onTeacherInput(e) {
 const sameDebate = (d, extra = {}) => ({ p: P, t: d.title, ga: d.group_a, gb: d.group_b, rub: d.rubric, ma: d.members_a, mb: d.members_b, tm: d.total_mark, w: d.w_teacher, ...extra });
 
 const actions = {
-  out: () => { sessionStorage.vp = P = ''; H.length = 0; H.push(vTeacher); draw(); },
+  out: () => { sessionStorage.vp = P = ''; ofilter = 'all'; H.length = 0; H.push(vTeacher); draw(); },
   qr: ({ item }) => showQR(item.title, item.code),
   link: ({ item }) => copyText(screenLink(item.code)).then(() => toast(T('copied'))),
-  xlAll: () => exportData('x', { ds: L, qs: Q, fs: FI, ms: MS }),
-  wdAll: () => exportData('w', { ds: L, qs: Q, fs: FI, ms: MS }),
+  xlAll: () => exportData('x', { ds: L.filter(visible), qs: Q.filter(visible), fs: FI.filter(visible), ms: MS.filter(visible) }),
+  wdAll: () => exportData('w', { ds: L.filter(visible), qs: Q.filter(visible), fs: FI.filter(visible), ms: MS.filter(visible) }),
+  // teacher accounts (owner only)
+  tReset: async ({ item, card }) => {
+    const np = card.querySelector('.np').value;
+    if (np.length < 6) return toast(T('badP'));
+    await rpc('vt_update', { p: P, i: item.id, patch: { pw: np } });
+    card.querySelector('.np').value = ''; toast(T('passSaved'));
+  },
+  tTog: async ({ item }) => { await rpc('vt_update', { p: P, i: item.id, patch: { active: !item.active } }); await reload(); },
+  tDel: async ({ item }) => {
+    if (!confirm(T('delTConf'))) return;
+    await rpc('vt_delete', { p: P, i: item.id }); await reload();
+  },
   // debates and member/presenter evaluations
   tg: async ({ item, kind }) => { await rpc(kind === 'm' ? 'vm_update' : 'vd_update', { p: P, i: item.id, patch: { status: item.status === 'open' ? 'closed' : 'open' } }); await reload(); },
   rel: async ({ item, kind }) => { await rpc(kind === 'm' ? 'vm_update' : 'vd_update', { p: P, i: item.id, patch: { released: !item.released } }); await reload(); },
@@ -629,12 +690,27 @@ const creators = {
     if (!$('#t').value.trim() || !name || !(+$('#tm').value > 0)) return toast(T('badM'));
     await rpc('vm_create', { p: P, t: $('#t').value.trim(), style: 'person', groups: [{ name: '', members: [name] }], tm: +$('#tm').value, w: +$('#w').value });
     await reload();
+  },
+  mkt: async () => {
+    const nm = $('#tn').value.trim(), un = $('#tu').value.trim().toLowerCase(), pw = $('#tp').value;
+    if (!nm || !/^[a-z0-9._-]{3,30}$/.test(un) || pw.length < 6) return toast(T('badT'));
+    await rpc('vt_create', { p: P, nm, un, pw }); toast(T('accMade')); await reload();
+  },
+  chgp: async () => {
+    const np = $('#mp').value;
+    if (np.length < 6) return toast(T('badP'));
+    await rpc('vt_passcode', { p: P, np });
+    P = P.includes(SEP) ? P.slice(0, P.indexOf(SEP) + 1) + np : np;   // keep this session signed in with the new passcode
+    sessionStorage.vp = P; $('#mp').value = ''; toast(T('passSaved'));
   }
 };
 async function onTeacherClick(e) {
   const t = e.target;
   try {
-    if (t.dataset.tab) { if (t.dataset.tab !== tab) { const k = t.dataset.tab; nav(() => { tab = k; vDash(); }); } return; }
+    if (t.dataset.tab) {
+      if (t.dataset.tab !== tab) { const k = t.dataset.tab; if (k === 't' && ME.admin) TS = await rpc('vt_list', { p: P }); nav(() => { tab = k; vDash(); }); }
+      return;
+    }
     if (t.dataset.sty) { astyle = t.dataset.sty; return vDash(); }
     if (creators[t.id]) return await creators[t.id]();
     const a = t.dataset.a; if (!a) return;
@@ -643,6 +719,7 @@ async function onTeacherClick(e) {
     else if (card && card.dataset.qid) { ctx.kind = 'q'; ctx.item = Q.find(x => x.id === card.dataset.qid); }
     else if (card && card.dataset.fid) { ctx.kind = 'f'; ctx.item = FI.find(x => x.id === card.dataset.fid); }
     else if (card && card.dataset.mid) { ctx.kind = 'm'; ctx.item = MS.find(x => x.id === card.dataset.mid); }
+    else if (card && card.dataset.tid) { ctx.kind = 't'; ctx.item = TS.find(x => x.id === card.dataset.tid); }
     await actions[a](ctx);
   } catch (er) { toast(er.message); }
 }
